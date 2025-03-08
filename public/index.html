@@ -1,0 +1,2549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRALI LIBROS - Sistema de Gestión</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Agregar estos enlaces antes de cerrar el head -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f6fa;
+        }
+
+        .login-container {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 1rem;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 420px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .form-floating {
+            position: relative;
+        }
+
+        .form-floating > .form-control {
+            padding: 1rem 1rem;
+            height: calc(3.5rem + 2px);
+            line-height: 1.25;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .form-floating > .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(44, 62, 80, 0.1);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #64748b;
+            padding: 0;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
+
+        .btn {
+            border-radius: 10px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-outline-secondary {
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-outline-secondary:hover {
+            background: #f8fafc;
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+        }
+
+        .invalid-feedback {
+            font-size: 0.875rem;
+            color: var(--accent-color);
+            margin-top: 0.25rem;
+        }
+
+        #loginAlert {
+            border-radius: 10px;
+            font-size: 0.875rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-container {
+            display: none;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            padding-top: 1rem;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        /* Estilos específicos para el administrador */
+        .sidebar-admin {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
+            color: white !important;
+        }
+
+        .sidebar-admin .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-admin .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+        }
+
+        .sidebar-admin .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.3) !important;
+            color: white !important;
+            font-weight: bold;
+        }
+
+        /* Estilos específicos para el auxiliar */
+        .sidebar-auxiliar {
+            background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%) !important;
+            color: white !important;
+        }
+
+        .sidebar-auxiliar .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-auxiliar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+        }
+
+        .sidebar-auxiliar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.3) !important;
+            color: white !important;
+            font-weight: bold;
+        }
+
+        /* Estilos específicos para el invitado */
+        .sidebar-invitado {
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%) !important;
+            color: white !important;
+        }
+
+        .sidebar-invitado .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-invitado .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+        }
+
+        .sidebar-invitado .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.3) !important;
+            color: white !important;
+            font-weight: bold;
+        }
+
+        .sidebar .nav-link {
+            color: white;
+            padding: 0.8rem 1rem;
+            margin: 0.2rem 0;
+            border-radius: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .sidebar .nav-link.active {
+            background-color: var(--secondary-color);
+        }
+
+        .sidebar .nav-link i {
+            width: 1.5rem;
+            text-align: center;
+            margin-right: 0.5rem;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            background-color: #ffffff !important;
+        }
+
+        .main-content-admin {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .main-content-auxiliar {
+            background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%);
+            color: white;
+        }
+
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-left: var(--sidebar-width);
+            padding: 1rem 2rem;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: none;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        .stat-card h3 {
+            color: #2c3e50;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .stat-card .h2 {
+            color: #3498db;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .stat-card .icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            opacity: 0.1;
+            color: #2c3e50;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .chart-container h4 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .dashboard-header {
+            margin-bottom: 30px;
+        }
+
+        .dashboard-header h2 {
+            color: #2c3e50;
+            font-weight: 700;
+        }
+
+        .dashboard-header p {
+            color: #7f8c8d;
+            margin: 0;
+        }
+
+        h2, h3, h4, h5 {
+            color: #333;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        /* Responsive Sidebar */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .navbar {
+                margin-left: 0;
+            }
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Estilos para las notificaciones */
+        .toastify {
+            padding: 12px 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        .toastify.on {
+            opacity: 1;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Estilos específicos por tipo */
+        .notification-success {
+            border-left: 4px solid #00b09b;
+        }
+
+        .notification-warning {
+            border-left: 4px solid #ff8008;
+        }
+
+        .notification-danger {
+            border-left: 4px solid #ff5f6d;
+        }
+
+        .notification-info {
+            border-left: 4px solid #2193b0;
+        }
+
+        /* Estilos para hover en las filas de las tablas */
+        .table tbody tr {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+            transform: translateX(5px);
+            cursor: pointer;
+            box-shadow: -5px 0 0 #3498db;
+        }
+
+        /* Estilos para hover en los botones */
+        .btn {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Estilos para hover en los enlaces del sidebar */
+        .sidebar .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar .nav-link:hover {
+            padding-left: 1.5rem;
+        }
+
+        .sidebar .nav-link:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background-color: #fff;
+            transform: scaleY(0);
+            transition: transform 0.2s;
+        }
+
+        .sidebar .nav-link:hover:before {
+            transform: scaleY(1);
+        }
+
+        /* Estilos para hover en los select y inputs */
+        .form-control:hover, .form-select:hover {
+            border-color: #3498db;
+        }
+
+        /* Estilos para hover en las badges */
+        .badge {
+            transition: all 0.2s ease;
+        }
+
+        .badge:hover {
+            transform: scale(1.1);
+        }
+
+        /* Estilos para hover en las cards del dashboard */
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        /* Estilos para hover en los iconos */
+        .fas {
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover .fas {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Section -->
+    <div id="loginSection" class="login-container">
+        <div class="login-card">
+            <div class="text-center mb-4">
+                <h2 class="text-primary fw-bold">CRALI LIBROS</h2>
+                <p class="text-muted">Centro de Recursos y Aprendizaje de Lingüística e Idiomas</p>
+                </div>
+            <form id="loginForm" class="needs-validation" novalidate>
+                <div class="mb-4">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" id="username" placeholder="Usuario" required>
+                        <label for="username"><i class="fas fa-user me-2"></i>Usuario</label>
+                    </div>
+                    <div class="invalid-feedback">
+                        Por favor ingrese su nombre de usuario
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="form-floating">
+                        <input type="password" class="form-control" id="password" placeholder="Contraseña" required>
+                        <label for="password"><i class="fas fa-lock me-2"></i>Contraseña</label>
+                        <button type="button" class="btn btn-link password-toggle" onclick="togglePassword('password')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="invalid-feedback">
+                        Por favor ingrese su contraseña
+                </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mb-3 py-2">
+                    <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                </button>
+                <button type="button" class="btn btn-outline-secondary w-100 py-2" id="btnInvitado">
+                    <i class="fas fa-user-graduate me-2"></i>Continuar como Invitado
+                </button>
+            </form>
+            <div id="loginAlert" class="alert alert-danger mt-3" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div id="dashboardSection" class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="px-3 py-2">
+                <h4 class="text-white">CRALI LIBROS</h4>
+            </div>
+            <ul class="nav flex-column mt-4">
+                <li class="nav-item px-2">
+                    <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+                        <i class="fas fa-chart-line"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item px-2" id="usuariosNav">
+                    <a class="nav-link" href="#" onclick="showSection('usuarios')">
+                        <i class="fas fa-users"></i> Usuarios
+                    </a>
+                </li>
+                <li class="nav-item px-2" id="librosNav">
+                    <a class="nav-link" href="#" onclick="showSection('libros')">
+                        <i class="fas fa-book"></i> Libros
+                    </a>
+                </li>
+                <li class="nav-item px-2" id="lectoresNav">
+                    <a class="nav-link" href="#" onclick="showSection('lectores')">
+                        <i class="fas fa-user-graduate"></i> Lectores
+                    </a>
+                </li>
+                <li class="nav-item px-2" id="prestamosNav">
+                    <a class="nav-link" href="#" onclick="showSection('prestamos')">
+                        <i class="fas fa-handshake"></i> Préstamos
+                    </a>
+                </li>
+                <li class="nav-item px-2" id="historialNav">
+                    <a class="nav-link" href="#" onclick="showSection('historial')">
+                        <i class="fas fa-history"></i> Historial
+                    </a>
+                </li>
+            </ul>
+            <div class="mt-auto px-3 py-2 position-absolute bottom-0">
+                <span class="text-white d-block mb-2" id="userInfo"></span>
+                <button class="btn btn-outline-light w-100" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Views Container -->
+            <div class="container-fluid">
+                <!-- Dashboard View -->
+                <div id="dashboardView">
+                    <h2 class="mb-4">Dashboard</h2>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <h3>Libros Totales</h3>
+                                <p id="totalLibros" class="h2">0</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <h3>Libros Prestados</h3>
+                                <p id="librosPrestados" class="h2">0</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <h3>Usuarios Activos</h3>
+                                <p id="usuariosActivos" class="h2">0</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <h3>Préstamos del Mes</h3>
+                                <p id="prestamosMes" class="h2">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="chart-container" style="height: 300px;">
+                                <canvas id="prestamosChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="chart-container" style="height: 400px;">
+                                <canvas id="librosChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usuarios View -->
+                <div id="usuariosView" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Gestión de Usuarios</h2>
+                        <button class="btn btn-primary" onclick="showModal('usuario')">
+                            <i class="fas fa-plus"></i> Nuevo Usuario
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usuariosTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Libros View -->
+                <div id="librosView" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Gestión de Libros</h2>
+                        <div class="d-flex gap-2">
+                            <select class="form-select" id="filtroArea" onchange="filtrarLibrosPorArea()">
+                                <option value="">Todas las áreas</option>
+                                <option value="ingles">Inglés</option>
+                                <option value="frances">Francés</option>
+                                <option value="aymara">Aymara</option>
+                                <option value="quechua">Quechua</option>
+                                <option value="castellano">Castellano</option>
+                                <option value="portugues">Portugués</option>
+                                <option value="coreano">Coreano</option>
+                                <option value="aleman">Alemán</option>
+                                <option value="otros">Otros</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="showModal('libro')">
+                                <i class="fas fa-plus"></i> Nuevo Libro
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Autor</th>
+                                    <th>Año</th>
+                                    <th>Área</th>
+                                    <th>Signatura</th>
+                                    <th>Ejemplares</th>
+                                    <th>Estado</th>
+                                    <th>PDF</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="librosTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Lectores View -->
+                <div id="lectoresView" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Gestión de Lectores</h2>
+                        <button class="btn btn-primary" onclick="showModal('lector')">
+                            <i class="fas fa-plus"></i> Nuevo Lector
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nombres Completos</th>
+                                    <th>Cédula</th>
+                                    <th>Registro Universitario</th>
+                                    <th>Dirección</th>
+                                    <th>Celular</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lectoresTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Préstamos View -->
+                <div id="prestamosView" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Gestión de Préstamos</h2>
+                        <button class="btn btn-primary" onclick="showModal('prestamo')">
+                            <i class="fas fa-plus"></i> Nuevo Préstamo
+                        </button>
+                    </div>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Libro</th>
+                                    <th>Usuario</th>
+                                    <th>Fecha Préstamo</th>
+                                    <th>Fecha Devolución</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prestamosTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Historial View -->
+                <div id="historialView" style="display: none;">
+                    <h2 class="mb-4">Historial de Préstamos</h2>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Libro</th>
+                                    <th>Usuario</th>
+                                    <th>Fecha Préstamo</th>
+                                    <th>Fecha Devolución</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historialTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <!-- Modal Usuario -->
+    <div class="modal fade" id="usuarioModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="usuarioForm">
+                        <input type="hidden" id="usuarioId">
+                        <div class="mb-3">
+                            <label class="form-label">Usuario</label>
+                            <input type="text" class="form-control" id="usuarioUsername" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contraseña</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="usuarioPassword">
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('usuarioPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Rol</label>
+                            <select class="form-control" id="usuarioRol" required>
+                                <option value="administrador">Administrador</option>
+                                <option value="auxiliar">Auxiliar</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarUsuario()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Libro -->
+    <div class="modal fade" id="libroModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Libro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="libroForm">
+                        <input type="hidden" id="libroId">
+                        <div class="mb-3">
+                            <label class="form-label">Título</label>
+                            <input type="text" class="form-control" id="libroTitulo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Autor</label>
+                            <input type="text" class="form-control" id="libroAutor" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Año</label>
+                            <input type="number" class="form-control" id="libroAnio" required min="1000" max="2024">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Área</label>
+                            <select class="form-control" id="libroArea" required>
+                                <option value="">Seleccione un idioma</option>
+                                <option value="ingles">Inglés</option>
+                                <option value="frances">Francés</option>
+                                <option value="aymara">Aymara</option>
+                                <option value="quechua">Quechua</option>
+                                <option value="castellano">Castellano</option>
+                                <option value="portugues">Portugués</option>
+                                <option value="coreano">Coreano</option>
+                                <option value="aleman">Alemán</option>
+                                <option value="otros">Otros</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Signatura Topográfica</label>
+                            <input type="text" class="form-control" id="libroSignatura" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ejemplares</label>
+                            <input type="number" class="form-control" id="libroEjemplares" required min="1">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Estado</label>
+                            <select class="form-control" id="libroEstado" required>
+                                <option value="disponible">Disponible</option>
+                                <option value="prestado">Prestado</option>
+                                <option value="mantenimiento">En Mantenimiento</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contenido PDF</label>
+                            <div class="input-group">
+                                <input type="file" class="form-control" id="libroPdf" accept=".pdf">
+                                <button class="btn btn-outline-secondary" type="button" onclick="verPdf()">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">Tamaño máximo: 10MB</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarLibro()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Préstamo -->
+    <div class="modal fade" id="prestamoModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Préstamo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="prestamoForm">
+                        <input type="hidden" id="prestamoId">
+                        <div class="mb-3">
+                            <label class="form-label">Buscar Libro</label>
+                            <input type="text" class="form-control mb-2" id="buscarLibro" placeholder="Buscar por título, autor o signatura...">
+                            <select class="form-control" id="prestamoLibro" required>
+                                <option value="">Seleccione un libro</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Buscar Lector</label>
+                            <input type="text" class="form-control mb-2" id="buscarLector" placeholder="Buscar por nombre, cédula o registro...">
+                            <select class="form-control" id="prestamoUsuario" required>
+                                <option value="">Seleccione un lector</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Fecha de Devolución</label>
+                            <input type="date" class="form-control" id="prestamoFechaDevolucion" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarPrestamo()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Lector -->
+    <div class="modal fade" id="lectorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Lector</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="lectorForm">
+                        <input type="hidden" id="lectorId">
+                        <div class="mb-3">
+                            <label class="form-label">Nombres Completos</label>
+                            <input type="text" class="form-control" id="lectorNombres" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Cédula de Identidad</label>
+                            <input type="text" class="form-control" id="lectorCedula" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Registro Universitario</label>
+                            <input type="text" class="form-control" id="lectorRegistro" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="lectorDireccion" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Número de Celular</label>
+                            <input type="tel" class="form-control" id="lectorCelular" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarLector()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agregar información institucional -->
+    <div style="position: fixed; bottom: 10px; right: 10px; text-align: right; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); font-size: 0.8rem; z-index: 1000;">
+        <p style="margin: 0;">Universidad Mayor de San Andrés</p>
+        <p style="margin: 0;">Carrera de Lingüística e Idiomas</p>
+        <p style="margin: 0; font-style: italic;">Diseño y desarrollo por Lic. Franz Canaza Aduviri</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Variables globales
+        let currentUser = null;
+        let usuarios = [];
+        let libros = [];
+        let prestamos = [];
+        let lectores = [];
+
+        // Funciones de inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            const sesionGuardada = sessionStorage.getItem('currentUser');
+            if (sesionGuardada) {
+                const user = JSON.parse(sesionGuardada);
+                currentUser = user;
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('dashboardSection').style.display = 'block';
+                document.getElementById('userInfo').textContent = `${user.username} (${user.rol})`;
+                configurarPermisosUsuario(user.rol);
+                showSection('dashboard');
+            }
+            
+            cargarDatos();
+            
+            // Inicializar validación de formulario
+            const form = document.getElementById('loginForm');
+            form.addEventListener('submit', handleLogin);
+            
+            // Prevenir envío con Enter en campos
+            form.querySelectorAll('input').forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        form.querySelector('button[type="submit"]').click();
+                    }
+                });
+            });
+        });
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = event.currentTarget.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+            
+            // Efecto de ripple en el botón
+            const button = event.currentTarget;
+            const circle = document.createElement('div');
+            const diameter = Math.max(button.clientWidth, button.clientHeight);
+            
+            circle.style.width = circle.style.height = `${diameter}px`;
+            circle.style.left = `${event.clientX - button.offsetLeft - diameter/2}px`;
+            circle.style.top = `${event.clientY - button.offsetTop - diameter/2}px`;
+            circle.classList.add('ripple');
+            
+            const ripple = button.getElementsByClassName('ripple')[0];
+            if (ripple) {
+                ripple.remove();
+            }
+            
+            button.appendChild(circle);
+        }
+
+        async function cargarDatos() {
+            try {
+                const cargarLocal = (clave) => {
+                    const datos = localStorage.getItem(clave);
+                    return datos ? JSON.parse(datos) : null;
+                };
+
+                const usuariosCargados = cargarLocal('usuarios');
+                const librosCargados = cargarLocal('libros');
+                const prestamosCargados = cargarLocal('prestamos');
+                const lectoresCargados = cargarLocal('lectores');
+
+                usuarios = usuariosCargados || [
+                    {
+                        id: "1",
+                        username: "admin",
+                        password: "admin123",
+                        rol: "administrador"
+                    }
+                ];
+                libros = librosCargados || [];
+                prestamos = prestamosCargados || [];
+                lectores = lectoresCargados || [];
+
+                if (!usuariosCargados) {
+                    await guardarDatos();
+                }
+
+                console.log('Usuarios cargados:', usuarios);
+            } catch (error) {
+                console.error('Error al cargar datos:', error);
+                mostrarNotificacion('Error al cargar los datos del sistema', 'danger');
+            }
+        }
+
+        async function guardarDatos() {
+            try {
+                localStorage.setItem('usuarios', JSON.stringify(usuarios));
+                localStorage.setItem('libros', JSON.stringify(libros));
+                localStorage.setItem('prestamos', JSON.stringify(prestamos));
+                localStorage.setItem('lectores', JSON.stringify(lectores));
+                return true;
+            } catch (error) {
+                console.error('Error al guardar datos:', error);
+                return false;
+            }
+        }
+
+        // Funciones de autenticación mejoradas
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const form = document.getElementById('loginForm');
+            const username = document.getElementById('username');
+            const password = document.getElementById('password');
+            
+            // Validación del formulario
+            if (!form.checkValidity()) {
+                e.stopPropagation();
+                form.classList.add('was-validated');
+                return;
+            }
+
+            try {
+                // Mostrar indicador de carga
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Iniciando sesión...';
+
+                await cargarDatos();
+                
+                const user = usuarios.find(u => 
+                    u.username === username.value.trim() && 
+                    u.password === password.value.trim()
+                );
+
+                if (user) {
+                    // Guardar sesión
+                    sessionStorage.setItem('currentUser', JSON.stringify(user));
+                    
+                    // Animación de éxito
+                    mostrarNotificacion('¡Inicio de sesión exitoso!', 'success');
+                    
+                    // Transición suave
+                    const loginSection = document.getElementById('loginSection');
+                    loginSection.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        loginSection.style.display = 'none';
+                    document.getElementById('dashboardSection').style.display = 'block';
+                        setTimeout(() => {
+                            document.getElementById('dashboardSection').style.opacity = '1';
+                        }, 100);
+                    }, 500);
+
+                    // Configurar interfaz
+                    document.getElementById('userInfo').textContent = `${user.username} (${user.rol})`;
+                    currentUser = user;
+                    
+                    // Aplicar estilos según el rol
+                    const sidebar = document.querySelector('.sidebar');
+                    sidebar.className = 'sidebar ' + (user.rol === 'administrador' ? 'sidebar-admin' : 'sidebar-auxiliar');
+                    
+                    configurarPermisosUsuario(user.rol);
+                    showSection('dashboard');
+                    actualizarDashboard();
+                    
+                    form.reset();
+                } else {
+                    throw new Error('Credenciales inválidas');
+                }
+            } catch (error) {
+                mostrarNotificacion(
+                    error.message === 'Credenciales inválidas' 
+                        ? 'Usuario o contraseña incorrectos' 
+                        : 'Error al iniciar sesión',
+                    'danger'
+                );
+            } finally {
+                // Restaurar botón
+                const submitBtn = form.querySelector('button[type="submit"]');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión';
+            }
+        }
+
+        function mostrarNotificacion(mensaje, tipo) {
+            const estilos = {
+                success: {
+                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    icon: "✔️"
+                },
+                warning: {
+                    background: "linear-gradient(to right, #ff8008, #ffc837)",
+                    icon: "⚠️"
+                },
+                danger: {
+                    background: "linear-gradient(to right, #ff5f6d, #ffc371)",
+                    icon: "❌"
+                },
+                info: {
+                    background: "linear-gradient(to right, #2193b0, #6dd5ed)",
+                    icon: "ℹ️"
+                }
+            };
+
+            const estilo = estilos[tipo] || estilos.info;
+
+            Toastify({
+                text: `${estilo.icon} ${mensaje}`,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                stopOnFocus: true,
+                className: `notification-${tipo}`,
+                style: {
+                    background: estilo.background,
+                    borderRadius: "10px",
+                    boxShadow: "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)"
+                },
+                onClick: function(){} // Callback después de hacer clic
+            }).showToast();
+        }
+
+        function configurarPermisosUsuario(rol) {
+            // Primero, mostrar todos los elementos
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.style.display = 'block';
+            });
+
+            switch(rol) {
+                case 'administrador':
+                    // Acceso total
+                    document.querySelectorAll('.btn-danger').forEach(btn => btn.style.display = 'inline-block');
+                    document.querySelectorAll('.btn-primary').forEach(btn => btn.style.display = 'inline-block');
+                    document.querySelectorAll('.btn-success').forEach(btn => btn.style.display = 'inline-block');
+                    document.querySelectorAll('[onclick*="showModal"]').forEach(btn => btn.style.display = 'block');
+                    break;
+
+                case 'auxiliar':
+                    // Ocultar sección de usuarios
+                    document.getElementById('usuariosNav').style.display = 'none';
+                    // Mostrar botones de añadir y editar, ocultar eliminar
+                    document.querySelectorAll('.btn-danger').forEach(btn => btn.style.display = 'none');
+                    document.querySelectorAll('.btn-primary').forEach(btn => btn.style.display = 'inline-block');
+                    document.querySelectorAll('.btn-success').forEach(btn => btn.style.display = 'inline-block');
+                    document.querySelectorAll('[onclick*="showModal"]').forEach(btn => btn.style.display = 'block');
+                    break;
+
+                case 'invitado':
+                    configurarPermisosInvitado();
+                    break;
+            }
+        }
+
+        function configurarPermisosInvitado() {
+            try {
+                // Ocultar secciones no permitidas
+                const seccionesOcultas = ['usuariosNav', 'prestamosNav', 'lectoresNav', 'historialNav'];
+                seccionesOcultas.forEach(id => {
+                const elemento = document.getElementById(id);
+                    if (elemento) {
+                        elemento.style.display = 'none';
+                    }
+                });
+
+                // Mostrar solo las secciones permitidas
+                const seccionesPermitidas = ['dashboard', 'libros'];
+                document.querySelectorAll('[id$="View"]').forEach(seccion => {
+                    if (!seccionesPermitidas.includes(seccion.id.replace('View', ''))) {
+                        seccion.style.display = 'none';
+                    }
+                });
+
+                // Ocultar botones de acción
+            document.querySelectorAll('.btn-primary, .btn-danger, .btn-success').forEach(btn => {
+                    if (!btn.classList.contains('btn-outline-light')) {
+                    btn.style.display = 'none';
+                }
+            });
+
+                // Ocultar columna de acciones en tablas
+                document.querySelectorAll('table thead tr').forEach(tr => {
+                    const ultimaCelda = tr.lastElementChild;
+                    if (ultimaCelda && ultimaCelda.textContent.trim().toLowerCase() === 'acciones') {
+                        ultimaCelda.style.display = 'none';
+                    }
+                });
+
+                // Deshabilitar funcionalidades de edición
+                document.querySelectorAll('[onclick*="showModal"]').forEach(elemento => {
+                    elemento.style.display = 'none';
+                });
+
+                // Ajustar visualización de tablas para modo invitado
+                document.querySelectorAll('table tbody tr').forEach(tr => {
+                    const ultimaCelda = tr.lastElementChild;
+                    if (ultimaCelda) {
+                        ultimaCelda.style.display = 'none';
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error al configurar permisos de invitado:', error);
+            }
+        }
+
+        function logout() {
+            try {
+                // Limpiar datos de sesión
+                sessionStorage.clear();
+            currentUser = null;
+
+                // Resetear estados y formularios
+            document.getElementById('loginForm').reset();
+                document.querySelectorAll('.was-validated').forEach(form => {
+                    form.classList.remove('was-validated');
+                });
+
+                // Ocultar dashboard y mostrar login con animación
+                const dashboardSection = document.getElementById('dashboardSection');
+                const loginSection = document.getElementById('loginSection');
+
+                dashboardSection.style.opacity = '0';
+                setTimeout(() => {
+                    dashboardSection.style.display = 'none';
+                    loginSection.style.display = 'flex';
+                    loginSection.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        loginSection.style.opacity = '1';
+                    }, 100);
+                }, 300);
+
+                // Limpiar datos sensibles
+                libros = [];
+                prestamos = [];
+                lectores = [];
+                usuarios = [];
+
+                // Resetear gráficos si existen
+                const charts = Chart.instances;
+                charts.forEach(chart => chart.destroy());
+
+            } catch (error) {
+                console.error('Error al cerrar sesión:', error);
+            }
+        }
+
+        // Funciones de navegación
+        function showSection(section) {
+            document.querySelectorAll('[id$="View"]').forEach(el => el.style.display = 'none');
+            document.getElementById(`${section}View`).style.display = 'block';
+            
+            // Actualizar clase activa en el menú
+            document.querySelectorAll('.sidebar .nav-link').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            const activeLink = document.querySelector(`.sidebar .nav-link[onclick*="${section}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+            
+            // Actualizar datos de la sección
+            switch(section) {
+                case 'dashboard':
+                actualizarDashboard();
+                    break;
+                case 'usuarios':
+                actualizarTablaUsuarios();
+                    break;
+                case 'libros':
+                actualizarTablaLibros();
+                    break;
+                case 'prestamos':
+                actualizarTablaPrestamos();
+                    break;
+                case 'historial':
+                    actualizarHistorial(); // Agregamos la actualización del historial
+                    break;
+                case 'lectores':
+                actualizarTablaLectores();
+                    break;
+            }
+        }
+
+        // Funciones del Dashboard
+        function actualizarDashboard() {
+            // Actualizar estadísticas con iconos y animación
+            const stats = [
+                {
+                    id: 'totalLibros',
+                    valor: libros.length,
+                    icono: 'fas fa-book',
+                    color: '#3498db'
+                },
+                {
+                    id: 'librosPrestados',
+                    valor: prestamos.filter(p => p.estado === 'activo').length,
+                    icono: 'fas fa-handshake',
+                    color: '#e74c3c'
+                },
+                {
+                    id: 'usuariosActivos',
+                    valor: lectores.length,
+                    icono: 'fas fa-users',
+                    color: '#2ecc71'
+                },
+                {
+                    id: 'prestamosMes',
+                    valor: obtenerPrestamosMes(),
+                    icono: 'fas fa-calendar-check',
+                    color: '#f1c40f'
+                }
+            ];
+
+            stats.forEach(stat => {
+                const elemento = document.getElementById(stat.id);
+                if (elemento) {
+                    elemento.innerHTML = `
+                        <i class="${stat.icono} icon"></i>
+                        <span style="color: ${stat.color}" class="counter">${stat.valor}</span>
+                    `;
+                    animarContador(elemento.querySelector('.counter'), stat.valor);
+                }
+            });
+
+            // Actualizar gráficos según el rol
+            actualizarGraficos();
+        }
+
+        function animarContador(elemento, valorFinal) {
+            let valorActual = 0;
+            const duracion = 1000;
+            const pasos = 50;
+            const incremento = valorFinal / pasos;
+            
+            const animacion = setInterval(() => {
+                valorActual += incremento;
+                if (valorActual >= valorFinal) {
+                    elemento.textContent = valorFinal;
+                    clearInterval(animacion);
+            } else {
+                    elemento.textContent = Math.floor(valorActual);
+                }
+            }, duracion / pasos);
+        }
+
+        function actualizarGraficos() {
+            // Configuración común para los gráficos
+            Chart.defaults.color = '#2c3e50';
+            Chart.defaults.font.family = "'Segoe UI', sans-serif";
+
+            // Actualizar gráfico de préstamos
+            actualizarGraficoPrestamos();
+            
+            // Actualizar gráfico de libros
+            actualizarGraficoLibros();
+        }
+
+        function actualizarGraficoPrestamos() {
+            // Destruir el gráfico existente si existe
+            const chartExistente = Chart.getChart('prestamosChart');
+            if (chartExistente) {
+                chartExistente.destroy();
+            }
+
+            // Preparar datos para el gráfico
+            const prestamosActivos = prestamos.filter(p => p.estado === 'activo').length;
+            const prestamosDevueltos = prestamos.filter(p => p.estado === 'devuelto').length;
+            const prestamosAtrasados = prestamos.filter(p => {
+                if (p.estado === 'activo') {
+                    const fechaDevolucion = new Date(p.fechaDevolucion);
+                    return fechaDevolucion < new Date();
+                }
+                return false;
+            }).length;
+
+            const ctxPrestamos = document.getElementById('prestamosChart').getContext('2d');
+            new Chart(ctxPrestamos, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Activos', 'Devueltos', 'Atrasados'],
+                    datasets: [{
+                        data: [prestamosActivos, prestamosDevueltos, prestamosAtrasados],
+                        backgroundColor: ['#3498db', '#2ecc71', '#e74c3c'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Estado de Préstamos',
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: 20
+                        }
+                    },
+                    cutout: '60%',
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    }
+                }
+            });
+        }
+
+        function actualizarGraficoLibros() {
+            // Destruir el gráfico existente si existe
+            const chartExistente = Chart.getChart('librosChart');
+            if (chartExistente) {
+                chartExistente.destroy();
+            }
+
+            // Preparar datos para el gráfico
+            const librosPorArea = {};
+            const areasDisponibles = [
+                'ingles', 'frances', 'aymara', 'quechua', 
+                'castellano', 'portugues', 'coreano', 'aleman', 'otros'
+            ];
+
+            // Inicializar todas las áreas con 0
+            areasDisponibles.forEach(area => {
+                librosPorArea[area] = 0;
+            });
+
+            // Contar libros por área
+            libros.forEach(libro => {
+                if (libro.area) {
+                    librosPorArea[libro.area] = (librosPorArea[libro.area] || 0) + 1;
+                }
+            });
+
+            // Preparar colores
+            const colores = {
+                ingles: 'rgba(52, 152, 219, 0.7)',     // Azul
+                frances: 'rgba(231, 76, 60, 0.7)',      // Rojo
+                aymara: 'rgba(46, 204, 113, 0.7)',      // Verde
+                quechua: 'rgba(241, 196, 15, 0.7)',     // Amarillo
+                castellano: 'rgba(155, 89, 182, 0.7)',  // Morado
+                portugues: 'rgba(52, 73, 94, 0.7)',     // Gris oscuro
+                coreano: 'rgba(26, 188, 156, 0.7)',     // Turquesa
+                aleman: 'rgba(230, 126, 34, 0.7)',      // Naranja
+                otros: 'rgba(149, 165, 166, 0.7)'       // Gris claro
+            };
+
+            const ctxLibros = document.getElementById('librosChart').getContext('2d');
+            new Chart(ctxLibros, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(librosPorArea).map(area => 
+                        area.charAt(0).toUpperCase() + area.slice(1)
+                    ),
+                    datasets: [{
+                        label: 'Cantidad de Libros',
+                        data: Object.values(librosPorArea),
+                        backgroundColor: Object.keys(librosPorArea).map(area => colores[area]),
+                        borderWidth: 1,
+                        borderColor: '#ffffff',
+                        hoverBackgroundColor: Object.keys(librosPorArea).map(area => 
+                            colores[area].replace('0.7', '0.9')
+                        ),
+                        barPercentage: 0.7,
+                        categoryPercentage: 0.8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribución de Libros por Área',
+                            font: {
+                                size: 16,
+                                weight: 'bold',
+                                family: "'Segoe UI', sans-serif"
+                            },
+                            padding: {
+                                top: 20,
+                                bottom: 20
+                            },
+                            color: '#2c3e50'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((value * 100) / total).toFixed(1) : 0;
+                                    return `${value} libros (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        function obtenerPrestamosMes() {
+            const hoy = new Date();
+            return prestamos.filter(prestamo => {
+                const fechaPrestamo = new Date(prestamo.fechaPrestamo);
+                return fechaPrestamo.getMonth() === hoy.getMonth() &&
+                       fechaPrestamo.getFullYear() === hoy.getFullYear();
+            }).length;
+        }
+
+        // Funciones de gestión de usuarios
+        async function showModal(tipo, id = null) {
+            const modal = new bootstrap.Modal(document.getElementById(`${tipo}Modal`));
+            
+            if (tipo === 'prestamo') {
+                try {
+                    // Limpiar campos
+                    document.getElementById('prestamoForm').reset();
+                    document.getElementById('prestamoId').value = '';
+                    document.getElementById('buscarLibro').value = '';
+                    document.getElementById('buscarLector').value = '';
+                    
+                    // Cargar opciones de libros y lectores
+                    await cargarOpcionesPrestamo();
+                    
+                    // Establecer fecha mínima de devolución
+                    const fechaDevolucion = document.getElementById('prestamoFechaDevolucion');
+                    const hoy = new Date();
+                    const manana = new Date(hoy);
+                    manana.setDate(manana.getDate() + 1);
+                    fechaDevolucion.min = manana.toISOString().split('T')[0];
+                    
+                    // Establecer fecha máxima (30 días desde hoy)
+                    const maxFecha = new Date(hoy);
+                    maxFecha.setDate(maxFecha.getDate() + 30);
+                    fechaDevolucion.max = maxFecha.toISOString().split('T')[0];
+                    
+                    // Si es una edición, cargar los datos del préstamo
+                    if (id) {
+                        const prestamo = prestamos.find(p => p.id.toString() === id);
+                        if (prestamo) {
+                            document.getElementById('prestamoId').value = prestamo.id;
+                            document.getElementById('prestamoLibro').value = prestamo.libro;
+                            document.getElementById('prestamoUsuario').value = prestamo.usuario;
+                            document.getElementById('prestamoFechaDevolucion').value = prestamo.fechaDevolucion;
+                        }
+                    }
+
+                    modal.show();
+                } catch (error) {
+                    console.error('Error al mostrar el modal de préstamo:', error);
+                    mostrarNotificacion('Error al cargar el formulario de préstamo', 'danger');
+                }
+                    return;
+                }
+
+            if (id) {
+                const item = tipo === 'prestamo' ? prestamos.find(p => p.id.toString() === id) :
+                            tipo === 'libro' ? libros.find(l => l.id.toString() === id) :
+                            tipo === 'lector' ? lectores.find(l => l.id.toString() === id) :
+                            usuarios.find(u => u.id.toString() === id);
+                
+                if (item) {
+                    Object.keys(item).forEach(key => {
+                        const input = document.getElementById(`${tipo}${key.charAt(0).toUpperCase() + key.slice(1)}`);
+                        if (input && input.type !== 'file') {
+                            input.value = item[key];
+                        }
+                    });
+                }
+            } else {
+                document.getElementById(`${tipo}Form`).reset();
+                document.getElementById(`${tipo}Id`).value = '';
+            }
+            
+            modal.show();
+        }
+
+        // Función para guardar usuario con validaciones
+        async function guardarUsuario() {
+            const form = document.getElementById('usuarioForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            try {
+                const username = document.getElementById('usuarioUsername').value.trim();
+                const password = document.getElementById('usuarioPassword').value.trim();
+                const rol = document.getElementById('usuarioRol').value;
+                const id = document.getElementById('usuarioId').value || Date.now().toString();
+
+                // Validar campos requeridos
+                if (!username || !rol) {
+                    alert('Por favor complete todos los campos requeridos');
+                    return;
+                }
+
+                // Validar que el username no esté duplicado
+                const usuarioExistente = usuarios.find(u => 
+                    u.username === username && 
+                    u.id.toString() !== id.toString()
+                );
+
+                if (usuarioExistente) {
+                    alert('El nombre de usuario ya existe. Por favor, elija otro.');
+                    return;
+                }
+
+                // Validar contraseña para nuevos usuarios
+                if (!id && !password) {
+                    alert('La contraseña es obligatoria para nuevos usuarios');
+                    return;
+                }
+
+                const usuario = {
+                    id: id,
+                    username: username,
+                    password: password || usuarios.find(u => u.id.toString() === id.toString())?.password,
+                    rol: rol
+                };
+
+                const index = usuarios.findIndex(u => u.id.toString() === id.toString());
+                if (index >= 0) {
+                    usuarios[index] = {...usuarios[index], ...usuario};
+                } else {
+                    usuarios.push(usuario);
+                }
+
+                const guardadoExitoso = await guardarDatos();
+                
+                if (guardadoExitoso) {
+                    actualizarTablaUsuarios();
+                    const modalInstance = bootstrap.Modal.getInstance(document.getElementById('usuarioModal'));
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                    alert('Usuario guardado correctamente');
+                } else {
+                    throw new Error('No se pudo guardar el usuario');
+                }
+            } catch (error) {
+                console.error('Error al guardar usuario:', error);
+                alert('Error al guardar el usuario. Por favor, intente nuevamente.');
+            }
+        }
+
+        function actualizarTablaUsuarios() {
+            if (currentUser.rol !== 'administrador') return;
+            
+            const tbody = document.getElementById('usuariosTable');
+            tbody.innerHTML = '';
+            usuarios.forEach(usuario => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${usuario.username}</td>
+                    <td>${usuario.rol}</td>
+                    <td>Activo</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="showModal('usuario', ${usuario.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="eliminarUsuario(${usuario.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Función para eliminar usuario
+        function eliminarUsuario(id) {
+            if (currentUser.rol !== 'administrador') {
+                mostrarNotificacion('No tienes permisos para eliminar usuarios', 'warning');
+                return;
+            }
+
+            try {
+                if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+                    // Verificar que no sea el último administrador
+                    const administradores = usuarios.filter(u => u.rol === 'administrador');
+                    const usuarioAEliminar = usuarios.find(u => u.id.toString() === id.toString());
+                    
+                    if (administradores.length === 1 && usuarioAEliminar.rol === 'administrador') {
+                        mostrarNotificacion('No se puede eliminar el último administrador del sistema', 'warning');
+                        return;
+                    }
+
+                    usuarios = usuarios.filter(u => u.id.toString() !== id.toString());
+                    guardarDatos();
+                    actualizarTablaUsuarios();
+                    mostrarNotificacion('Usuario eliminado correctamente', 'success');
+                }
+            } catch (error) {
+                console.error('Error al eliminar usuario:', error);
+                mostrarNotificacion('Error al eliminar el usuario', 'danger');
+            }
+        }
+
+        // Función para eliminar libro
+        function eliminarLibro(id) {
+            if (currentUser.rol !== 'administrador') {
+                mostrarNotificacion('No tienes permisos para eliminar libros', 'warning');
+                return;
+            }
+
+            try {
+                if (confirm('¿Estás seguro de que deseas eliminar este libro?')) {
+                    // Verificar si el libro tiene préstamos activos
+                    const tienePrestamoActivo = prestamos.some(p => 
+                        p.libro === id && p.estado === 'activo'
+                    );
+
+                    if (tienePrestamoActivo) {
+                        mostrarNotificacion('No se puede eliminar un libro con préstamos activos', 'warning');
+                        return;
+                    }
+
+                    // Eliminar el libro
+                    libros = libros.filter(l => l.id !== id);
+                    
+                    // Guardar cambios y actualizar la interfaz
+                    guardarDatos();
+                    actualizarTablaLibros();
+                    actualizarDashboard();
+                    mostrarNotificacion('Libro eliminado correctamente', 'success');
+                }
+            } catch (error) {
+                console.error('Error al eliminar libro:', error);
+                mostrarNotificacion('Error al eliminar el libro', 'danger');
+            }
+        }
+
+        // Función para eliminar préstamo
+        function eliminarPrestamo(id) {
+            if (currentUser.rol !== 'administrador') {
+                mostrarNotificacion('No tienes permisos para eliminar préstamos', 'warning');
+                return;
+            }
+
+            try {
+                if (confirm('¿Estás seguro de que deseas eliminar este préstamo?')) {
+                    const prestamo = prestamos.find(p => p.id.toString() === id.toString());
+                    
+                    // Si el préstamo estaba activo, actualizar el estado del libro
+                    if (prestamo && prestamo.estado === 'activo') {
+                        const libro = libros.find(l => l.id.toString() === prestamo.libro);
+                        if (libro) {
+                            libro.estado = 'disponible';
+                        }
+                    }
+
+                    prestamos = prestamos.filter(p => p.id.toString() !== id.toString());
+                    guardarDatos();
+                    actualizarTablaPrestamos();
+                    actualizarHistorial();
+                    actualizarDashboard();
+                    mostrarNotificacion('Préstamo eliminado correctamente', 'success');
+                }
+            } catch (error) {
+                console.error('Error al eliminar préstamo:', error);
+                mostrarNotificacion('Error al eliminar el préstamo', 'danger');
+            }
+        }
+
+        // Función para eliminar lector
+        function eliminarLector(id) {
+            if (currentUser.rol !== 'administrador') {
+                mostrarNotificacion('No tienes permisos para eliminar lectores', 'warning');
+                return;
+            }
+
+            try {
+                if (confirm('¿Estás seguro de que deseas eliminar este lector?')) {
+                // Verificar si el lector tiene préstamos activos
+                    const tienePrestamoActivo = prestamos.some(p => 
+                        p.usuario.toString() === id.toString() && p.estado === 'activo'
+                );
+
+                    if (tienePrestamoActivo) {
+                        mostrarNotificacion('No se puede eliminar un lector con préstamos activos', 'warning');
+                    return;
+                }
+
+                    lectores = lectores.filter(l => l.id.toString() !== id.toString());
+                guardarDatos();
+                actualizarTablaLectores();
+                    mostrarNotificacion('Lector eliminado correctamente', 'success');
+                }
+            } catch (error) {
+                console.error('Error al eliminar lector:', error);
+                mostrarNotificacion('Error al eliminar el lector', 'danger');
+            }
+        }
+
+        // Función para eliminar todos los datos (solo administrador)
+        function eliminarTodosDatos() {
+            if (currentUser.rol !== 'administrador') {
+                mostrarNotificacion('No tienes permisos para realizar esta acción', 'warning');
+                return;
+            }
+
+            try {
+                if (confirm('¿Estás seguro de que deseas eliminar TODOS los datos del sistema? Esta acción no se puede deshacer.')) {
+                    if (confirm('Esta acción eliminará todos los registros. ¿Realmente deseas continuar?')) {
+                        // Mantener al usuario administrador actual
+                        const adminActual = usuarios.find(u => u.rol === 'administrador');
+                        
+                        // Reiniciar todos los arrays
+                        usuarios = [adminActual];
+                        libros = [];
+                        prestamos = [];
+                        lectores = [];
+
+                        // Guardar los cambios
+                        guardarDatos();
+
+                        // Actualizar todas las vistas
+                        actualizarTablaUsuarios();
+                        actualizarTablaLibros();
+                        actualizarTablaPrestamos();
+                        actualizarTablaLectores();
+                        actualizarHistorial();
+                    actualizarDashboard();
+
+                        mostrarNotificacion('Todos los datos han sido eliminados correctamente', 'success');
+                    }
+                }
+            } catch (error) {
+                console.error('Error al eliminar todos los datos:', error);
+                mostrarNotificacion('Error al eliminar los datos', 'danger');
+            }
+        }
+
+        // Funciones de gestión de libros
+        async function guardarLibro() {
+            const form = document.getElementById('libroForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            try {
+                const pdfFile = document.getElementById('libroPdf').files[0];
+                let pdfUrl = null;
+
+                if (pdfFile) {
+                    if (pdfFile.size > 10 * 1024 * 1024) {
+                        mostrarNotificacion('El archivo PDF no debe superar los 10MB', 'warning');
+                        return;
+                    }
+                    pdfUrl = await convertirPdfABase64(pdfFile);
+                }
+
+                const libro = {
+                    id: document.getElementById('libroId').value || Date.now().toString(),
+                    titulo: document.getElementById('libroTitulo').value.trim(),
+                    autor: document.getElementById('libroAutor').value.trim(),
+                    anio: document.getElementById('libroAnio').value,
+                    area: document.getElementById('libroArea').value,
+                    signatura: document.getElementById('libroSignatura').value.trim(),
+                    ejemplares: parseInt(document.getElementById('libroEjemplares').value),
+                    estado: document.getElementById('libroEstado').value,
+                    pdfUrl: pdfUrl || (document.getElementById('libroId').value ? libros.find(l => l.id.toString() === document.getElementById('libroId').value)?.pdfUrl : null)
+                };
+
+                const index = libros.findIndex(l => l.id.toString() === libro.id.toString());
+                if (index >= 0) {
+                    libros[index] = {...libros[index], ...libro};
+                } else {
+                    libros.push(libro);
+                }
+
+                await guardarDatos();
+                actualizarTablaLibros();
+                // Actualizar el dashboard después de guardar un libro
+                actualizarDashboard();
+
+                const modal = bootstrap.Modal.getInstance(document.getElementById('libroModal'));
+                modal.hide();
+                mostrarNotificacion('Libro guardado correctamente', 'success');
+            } catch (error) {
+                console.error('Error al guardar libro:', error);
+                mostrarNotificacion('Error al guardar el libro', 'danger');
+            }
+        }
+
+        function actualizarTablaLibros() {
+            // Mantener el área seleccionada al actualizar
+            const areaSeleccionada = document.getElementById('filtroArea').value;
+            if (areaSeleccionada) {
+                filtrarLibrosPorArea();
+            } else {
+                const tbody = document.getElementById('librosTable');
+                tbody.innerHTML = '';
+                libros.forEach(libro => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${libro.titulo}</td>
+                        <td>${libro.autor}</td>
+                        <td>${libro.anio || '-'}</td>
+                        <td>${libro.area ? libro.area.charAt(0).toUpperCase() + libro.area.slice(1) : '-'}</td>
+                        <td>${libro.signatura || '-'}</td>
+                        <td>${libro.ejemplares || 0}</td>
+                        <td>
+                            <span class="badge ${libro.estado === 'disponible' ? 'bg-success' : 
+                                               libro.estado === 'prestado' ? 'bg-warning' : 'bg-danger'}">
+                                ${libro.estado}
+                            </span>
+                        </td>
+                        <td>
+                            ${libro.pdfUrl ? `
+                                <button class="btn btn-sm btn-info" onclick="verPdf('${libro.id}')">
+                                    <i class="fas fa-file-pdf"></i>
+                                </button>
+                            ` : '-'}
+                        </td>
+                        ${currentUser.rol !== 'invitado' ? `
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="showModal('libro', '${libro.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            ${currentUser.rol === 'administrador' ? `
+                            <button class="btn btn-sm btn-danger" onclick="eliminarLibro('${libro.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            ` : ''}
+                        </td>
+                        ` : ''}
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        function convertirPdfABase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function verPdf(libroId) {
+            const libro = libros.find(l => l.id.toString() === libroId);
+            if (libro?.pdfUrl) {
+                const pdfWindow = window.open('', '_blank');
+                pdfWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>${libro.titulo} - PDF</title>
+                        </head>
+                        <body style="margin:0;padding:0;">
+                            <embed src="${libro.pdfUrl}" type="application/pdf" width="100%" height="100%" />
+                        </body>
+                    </html>
+                `);
+            } else {
+                alert('No hay PDF disponible para este libro');
+            }
+        }
+
+        // Funciones de gestión de lectores
+        async function guardarLector() {
+            const form = document.getElementById('lectorForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            try {
+                const lector = {
+                    id: document.getElementById('lectorId').value || Date.now().toString(),
+                    nombres: document.getElementById('lectorNombres').value.trim(),
+                    cedula: document.getElementById('lectorCedula').value.trim(),
+                    registro: document.getElementById('lectorRegistro').value.trim(),
+                    direccion: document.getElementById('lectorDireccion').value.trim(),
+                    celular: document.getElementById('lectorCelular').value.trim()
+                };
+
+                // Validar que la cédula no esté duplicada
+                const cedulaDuplicada = lectores.find(l => 
+                    l.cedula === lector.cedula && 
+                    l.id.toString() !== lector.id.toString()
+                );
+
+                if (cedulaDuplicada) {
+                    alert('Ya existe un lector con esta cédula');
+                    return;
+                }
+
+                const index = lectores.findIndex(l => l.id.toString() === lector.id.toString());
+                if (index >= 0) {
+                    lectores[index] = lector;
+                } else {
+                    lectores.push(lector);
+                }
+
+                const guardadoExitoso = await guardarDatos();
+                if (guardadoExitoso) {
+                    actualizarTablaLectores();
+                    bootstrap.Modal.getInstance(document.getElementById('lectorModal')).hide();
+                    alert('Lector guardado correctamente');
+                } else {
+                    throw new Error('No se pudo guardar el lector');
+                }
+            } catch (error) {
+                console.error('Error al guardar lector:', error);
+                alert('Error al guardar el lector. Por favor, intente nuevamente.');
+            }
+        }
+
+        function actualizarTablaLectores() {
+            const tbody = document.getElementById('lectoresTable');
+            tbody.innerHTML = '';
+            lectores.forEach(lector => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${lector.nombres}</td>
+                    <td>${lector.cedula}</td>
+                    <td>${lector.registro}</td>
+                    <td>${lector.direccion}</td>
+                    <td>${lector.celular}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="showModal('lector', '${lector.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        ${currentUser.rol === 'administrador' ? `
+                        <button class="btn btn-sm btn-danger" onclick="eliminarLector('${lector.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        ` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filtrarLibrosPorArea() {
+            const areaSeleccionada = document.getElementById('filtroArea').value;
+            const tbody = document.getElementById('librosTable');
+            tbody.innerHTML = '';
+            
+            const librosAMostrar = areaSeleccionada 
+                ? libros.filter(libro => libro.area === areaSeleccionada)
+                : libros;
+
+            librosAMostrar.forEach(libro => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${libro.titulo}</td>
+                    <td>${libro.autor}</td>
+                    <td>${libro.anio || '-'}</td>
+                    <td>${libro.area ? libro.area.charAt(0).toUpperCase() + libro.area.slice(1) : '-'}</td>
+                    <td>${libro.signatura || '-'}</td>
+                    <td>${libro.ejemplares || 0}</td>
+                    <td>
+                        <span class="badge ${libro.estado === 'disponible' ? 'bg-success' : 
+                                           libro.estado === 'prestado' ? 'bg-warning' : 'bg-danger'}">
+                            ${libro.estado}
+                        </span>
+                    </td>
+                    <td>
+                        ${libro.pdfUrl ? `
+                            <button class="btn btn-sm btn-info" onclick="verPdf('${libro.id}')">
+                                <i class="fas fa-file-pdf"></i>
+                            </button>
+                        ` : '-'}
+                    </td>
+                    ${currentUser.rol !== 'invitado' ? `
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="showModal('libro', '${libro.id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        ${currentUser.rol === 'administrador' ? `
+                        <button class="btn btn-sm btn-danger" onclick="eliminarLibro('${libro.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                        ` : ''}
+                    </td>
+                    ` : ''}
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Inicialización inmediata del botón de invitado
+        window.addEventListener('load', function() {
+            const invitadoBtn = document.getElementById('btnInvitado');
+            if (invitadoBtn) {
+                invitadoBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    loginComoInvitado();
+                });
+            }
+        });
+
+        function loginComoInvitado() {
+            try {
+            // Establecer usuario como invitado
+            currentUser = {
+                id: 'guest',
+                username: 'Invitado',
+                rol: 'invitado'
+            };
+
+                // Guardar sesión del invitado
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                // Animación de transición
+                const loginSection = document.getElementById('loginSection');
+                const dashboardSection = document.getElementById('dashboardSection');
+                
+                loginSection.style.opacity = '0';
+                setTimeout(() => {
+                    loginSection.style.display = 'none';
+                    dashboardSection.style.display = 'block';
+                    setTimeout(() => {
+                        dashboardSection.style.opacity = '1';
+                    }, 100);
+                }, 300);
+
+                // Configurar sidebar para invitado
+                const sidebar = document.querySelector('.sidebar');
+                sidebar.className = 'sidebar sidebar-invitado';
+
+                // Actualizar información del usuario
+                document.getElementById('userInfo').textContent = 'Modo Invitado';
+
+                // Configurar permisos y visibilidad
+                configurarPermisosInvitado();
+
+                // Cargar datos y mostrar dashboard
+                cargarDatos().then(() => {
+                    showSection('dashboard');
+                    actualizarDashboard();
+                    mostrarNotificacion('Bienvenido al modo invitado', 'success');
+                });
+
+            } catch (error) {
+                console.error('Error en inicio de sesión como invitado:', error);
+                mostrarNotificacion('Error al iniciar como invitado', 'danger');
+            }
+        }
+
+        async function cargarOpcionesPrestamo() {
+            try {
+                // Asegurarse de que los datos estén cargados
+                await cargarDatos();
+
+                // Obtener referencias a los elementos
+                const selectLibro = document.getElementById('prestamoLibro');
+                const selectLector = document.getElementById('prestamoUsuario');
+                const buscarLibroInput = document.getElementById('buscarLibro');
+                const buscarLectorInput = document.getElementById('buscarLector');
+
+                // Limpiar las opciones existentes
+                selectLibro.innerHTML = '<option value="">Seleccione un libro</option>';
+                selectLector.innerHTML = '<option value="">Seleccione un lector</option>';
+
+                // Cargar libros disponibles
+                const librosDisponibles = libros.filter(libro => libro.estado === 'disponible');
+                console.log('Libros disponibles:', librosDisponibles); // Debug
+
+                librosDisponibles.forEach(libro => {
+                    const option = document.createElement('option');
+                    option.value = libro.id;
+                    option.textContent = `${libro.titulo} - ${libro.autor} (${libro.signatura})`;
+                    selectLibro.appendChild(option);
+                });
+
+                // Cargar lectores
+                lectores.forEach(lector => {
+                    const option = document.createElement('option');
+                    option.value = lector.id;
+                    option.textContent = `${lector.nombres} - ${lector.cedula}`;
+                    selectLector.appendChild(option);
+                });
+
+                // Función para normalizar texto
+                function normalizarTexto(texto) {
+                    return texto.toLowerCase()
+                        .normalize("NFD")
+                        .replace(/[\u0300-\u036f]/g, "");
+                }
+
+                // Función de búsqueda para libros
+                buscarLibroInput.addEventListener('input', function() {
+                    const busqueda = normalizarTexto(this.value);
+                    Array.from(selectLibro.options).forEach(option => {
+                        if (option.value === '') return;
+                        const textoOpcion = normalizarTexto(option.text);
+                        option.style.display = textoOpcion.includes(busqueda) ? '' : 'none';
+                    });
+                });
+
+                // Función de búsqueda para lectores
+                buscarLectorInput.addEventListener('input', function() {
+                    const busqueda = normalizarTexto(this.value);
+                    Array.from(selectLector.options).forEach(option => {
+                        if (option.value === '') return;
+                        const textoOpcion = normalizarTexto(option.text);
+                        option.style.display = textoOpcion.includes(busqueda) ? '' : 'none';
+                    });
+                });
+
+                // Verificar si hay libros disponibles
+                if (librosDisponibles.length === 0) {
+                    mostrarNotificacion('No hay libros disponibles para préstamo', 'warning');
+                }
+
+            } catch (error) {
+                console.error('Error al cargar opciones de préstamo:', error);
+                mostrarNotificacion('Error al cargar las opciones de préstamo', 'danger');
+            }
+        }
+
+        async function guardarPrestamo() {
+            const form = document.getElementById('prestamoForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            try {
+                const libroId = document.getElementById('prestamoLibro').value;
+                const lectorId = document.getElementById('prestamoUsuario').value;
+                const fechaDevolucion = document.getElementById('prestamoFechaDevolucion').value;
+
+                if (!libroId || !lectorId || !fechaDevolucion) {
+                    mostrarNotificacion('Por favor complete todos los campos', 'warning');
+                    return;
+                }
+
+                const prestamo = {
+                    id: document.getElementById('prestamoId').value || Date.now().toString(),
+                    libro: libroId,
+                    usuario: lectorId,
+                    fechaPrestamo: new Date().toISOString().split('T')[0],
+                    fechaDevolucion: fechaDevolucion,
+                    estado: 'activo'
+                };
+
+                // Actualizar estado del libro
+                const libroIndex = libros.findIndex(l => l.id.toString() === libroId);
+                if (libroIndex >= 0) {
+                    libros[libroIndex].estado = 'prestado';
+                }
+
+                const index = prestamos.findIndex(p => p.id.toString() === prestamo.id.toString());
+                if (index >= 0) {
+                    prestamos[index] = prestamo;
+                } else {
+                    prestamos.push(prestamo);
+                }
+
+                await guardarDatos();
+                actualizarTablaPrestamos();
+                actualizarDashboard();
+
+                const modal = bootstrap.Modal.getInstance(document.getElementById('prestamoModal'));
+                modal.hide();
+                mostrarNotificacion('Préstamo registrado correctamente', 'success');
+            } catch (error) {
+                console.error('Error al guardar préstamo:', error);
+                mostrarNotificacion('Error al registrar el préstamo', 'danger');
+            }
+        }
+
+        function actualizarTablaPrestamos() {
+            const tbody = document.getElementById('prestamosTable');
+            tbody.innerHTML = '';
+            
+            prestamos.forEach(prestamo => {
+                const libro = libros.find(l => l.id.toString() === prestamo.libro);
+                const lector = lectores.find(l => l.id.toString() === prestamo.usuario);
+                
+                if (libro && lector) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${libro.titulo}</td>
+                        <td>${lector.nombres}</td>
+                        <td>${prestamo.fechaPrestamo}</td>
+                        <td>${prestamo.fechaDevolucion}</td>
+                        <td>
+                            <span class="badge ${prestamo.estado === 'activo' ? 'bg-warning' : 
+                                          prestamo.estado === 'devuelto' ? 'bg-success' : 'bg-danger'}">
+                                ${prestamo.estado}
+                            </span>
+                        </td>
+                        <td>
+                            ${prestamo.estado === 'activo' ? `
+                                <button class="btn btn-sm btn-success" onclick="devolverPrestamo('${prestamo.id}')">
+                                    <i class="fas fa-check"></i> Devolver
+                                </button>
+                            ` : ''}
+                            ${currentUser.rol === 'administrador' ? `
+                                <button class="btn btn-sm btn-danger" onclick="eliminarPrestamo('${prestamo.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            ` : ''}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            });
+        }
+
+        function devolverPrestamo(id) {
+            if (confirm('¿Confirma la devolución del libro?')) {
+                const prestamo = prestamos.find(p => p.id.toString() === id);
+                if (prestamo) {
+                    prestamo.estado = 'devuelto';
+                    
+                    // Actualizar estado del libro
+                    const libro = libros.find(l => l.id.toString() === prestamo.libro);
+                    if (libro) {
+                        libro.estado = 'disponible';
+                    }
+                    
+                    guardarDatos();
+                    actualizarTablaPrestamos();
+                    actualizarDashboard();
+                    mostrarNotificacion('Libro devuelto correctamente', 'success');
+                }
+            }
+        }
+
+        function actualizarHistorial() {
+            try {
+                const tbody = document.getElementById('historialTable');
+                tbody.innerHTML = '';
+                
+                // Obtener todos los préstamos y ordenarlos por fecha (más recientes primero)
+                let prestamosAMostrar = [...prestamos].sort((a, b) => 
+                    new Date(b.fechaPrestamo) - new Date(a.fechaPrestamo)
+                );
+
+                // Filtrar préstamos según el rol del usuario
+                if (currentUser.rol === 'invitado') {
+                    return; // Los invitados no ven el historial
+                } else if (currentUser.rol !== 'administrador' && currentUser.rol !== 'auxiliar') {
+                    prestamosAMostrar = prestamosAMostrar.filter(p => p.usuario === currentUser.id);
+                }
+
+                prestamosAMostrar.forEach(prestamo => {
+                    const libro = libros.find(l => l.id.toString() === prestamo.libro);
+                    const lector = lectores.find(l => l.id.toString() === prestamo.usuario);
+                    
+                    if (libro && lector) {
+                        const tr = document.createElement('tr');
+                        
+                        // Determinar el estado y clase del badge
+                        let estadoClase = '';
+                        let estadoTexto = prestamo.estado;
+                        
+                        switch(prestamo.estado) {
+                            case 'activo':
+                                if (new Date(prestamo.fechaDevolucion) < new Date()) {
+                                    estadoClase = 'bg-danger';
+                                    estadoTexto = 'Atrasado';
+                                } else {
+                                    estadoClase = 'bg-warning';
+                                    estadoTexto = 'Activo';
+                                }
+                                break;
+                            case 'devuelto':
+                                estadoClase = 'bg-success';
+                                break;
+                            default:
+                                estadoClase = 'bg-secondary';
+                        }
+
+                        tr.innerHTML = `
+                            <td>${libro.titulo}</td>
+                            <td>${lector.nombres}</td>
+                            <td>${new Date(prestamo.fechaPrestamo).toLocaleDateString()}</td>
+                            <td>${new Date(prestamo.fechaDevolucion).toLocaleDateString()}</td>
+                            <td>
+                                <span class="badge ${estadoClase}">
+                                    ${estadoTexto}
+                                </span>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    }
+                });
+
+                // Mostrar mensaje si no hay préstamos
+                if (prestamosAMostrar.length === 0) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td colspan="5" class="text-center">
+                            No hay registros de préstamos para mostrar
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+
+            } catch (error) {
+                console.error('Error al actualizar historial:', error);
+                mostrarNotificacion('Error al cargar el historial de préstamos', 'danger');
+            }
+        }
+    </script>
+</body>
+</html> 
