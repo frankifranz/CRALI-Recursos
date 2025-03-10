@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const pool = require("../../../database/db");
+const pool = require("../../database/db");
 
 // Ruta para obtener todos los lectores
 router.get("/", async (req, res) => {
