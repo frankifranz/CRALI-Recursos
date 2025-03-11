@@ -23,10 +23,6 @@ app.use("/api/lectores", lectoresRoutes);
 app.use("/api/prestamos", prestamosRoutes);
 app.use("/api/historial", historialRoutes);
 
-// Ruta de prueba
-app.get("/", (req, res) => {
-    res.send("📚 Servidor funcionando correctamente 🚀");
-});
 const path = require("path");
 
 // Servir archivos estáticos desde la carpeta "public"
@@ -34,9 +30,4 @@ app.use(express.static(path.join(__dirname, "../public")));
 
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../public/index.html"));
-});
-
-// Iniciar servidor
-app.listen(PORT, () => {
-    console.log(`✅ Servidor corriendo en http://localhost:${PORT}`);
 });
